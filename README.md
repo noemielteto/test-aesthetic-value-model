@@ -4,6 +4,12 @@ Analyses and plotting functions used here depend on the [main package containing
 
 # Folder content
 
+The main directory contains the pre-processed data from all participants as well as the results of the simulated, random-order refits.
+
+In addition, it contains "map_imgName_imgIdx.csv" which provides a safe way to ensure that DNN-derived image features are mapped unto the correct images in the data files. 
+
+As a bonus, it contains the "plot)images_inVGGspace.py" script which visualizes the location of the stimulus images in reduced DNN-feature space.
+
 ## analysis
 
 Contains all scripts needed to reproduce the analyses reported in the paper as well as the code for re-creating the figures. NOTE that the model fitting may take a substantial amount of time, so if you do not want to tweak this, you might want to use the available model fitting results from the "results" folder.
