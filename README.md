@@ -2,6 +2,18 @@
 Data and analysis files for an experiment testing the viability of [a computational model of aesthetic value developed by Brielmann and Dayan (in press)](https://psyarxiv.com/eaqkc/).
 Analyses and plotting functions used here depend on the [main package containing the core functions of the computational model of aesthetic value](https://github.com/aenneb/intro-aesthetic-value-model).
 
+In order to run the model-fits, you will need to also download the main package and change the directory from which it is loaded, i.e., adjust the following lines in the respective scripts:
+```
+home_dir = os.getcwd()
+dataDir = home_dir + '/Papers/RoySocB/'
+```
+and
+```
+sys.path.append((home_dir + "/python_packages"))
+```
+
+If you want to replicate all analyses, you can run all scripts located in the "analysis" folder in alphabetic order. However, I would recommend not to re-fit the model for all participants unless you have a substantial amount of time and/or processing power.
+
 # Folder content
 
 The main directory contains the pre-processed data from all participants as well as the results of the simulated, random-order refits.
