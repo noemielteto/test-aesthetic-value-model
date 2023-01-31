@@ -20,3 +20,10 @@ Contains the .csv and .npy files for all preliminary and final results of the an
 
 Contains the complete code for running the experiment as described in the paper *except* for the jspsych files. Download jspsych 6.3.1 and save the folder inside the experiment_code folder to run the experiment.
 
+## VGG_features
+
+Contains the feature values and their PCA-reduced version for all stimuli based on vanilla, pretrained VGG-16.
+
+## ResNet50_features
+
+Contains the feature values and their PCA-reduced version for all stimuli based on vanilla, pretrained ResNet50.
