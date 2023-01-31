@@ -33,3 +33,9 @@ Contains the feature values and their PCA-reduced version for all stimuli based 
 ## ResNet50_features
 
 Contains the feature values and their PCA-reduced version for all stimuli based on vanilla, pretrained ResNet50.
+
+## figures
+
+Contains the figures from the paper.
+
+
