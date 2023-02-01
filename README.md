@@ -12,6 +12,15 @@ and
 sys.path.append((home_dir + "/python_packages"))
 ```
 
+You can also opt to only fetch the [main functions from the model implementation](https://github.com/aenneb/intro-aesthetic-value-model/blob/main/python_packages/aestheticsModel/fitPilot.py). Note that you will then need to replace
+```
+from aestheticsModel import fitPilot
+```
+with
+```
+import fitPilot
+```
+
 If you want to replicate all analyses, you can run all scripts located in the "analysis" folder in alphabetic order. However, I would recommend not to re-fit the model for all participants unless you have a substantial amount of time and/or processing power.
 
 # Folder content
