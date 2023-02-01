@@ -1,5 +1,5 @@
 # Testing a computational model of aesthetic value
-Data and analysis files for an experiment testing the viability of [a computational model of aesthetic value developed by Brielmann and Dayan (2022)](https://psycnet.apa.org/fulltext/2022-78031-001.html)(go to psyarxiv for the [free preprint] if you do not have accesss(https://psyarxiv.com/eaqkc/)).
+Data and analysis files for an experiment testing the viability of [a computational model of aesthetic value developed by Brielmann and Dayan (2022)](https://psycnet.apa.org/fulltext/2022-78031-001.html)(go to psyarxiv for the [free preprint](https://psyarxiv.com/eaqkc/) if you do not have accesss).
 Analyses and plotting functions used here depend on the [main package containing the core functions of the computational model of aesthetic value](https://github.com/aenneb/intro-aesthetic-value-model).
 
 In order to run the model-fits, you will need to also download the main package and change the directory from which it is loaded, i.e., adjust the following lines in the respective scripts:
