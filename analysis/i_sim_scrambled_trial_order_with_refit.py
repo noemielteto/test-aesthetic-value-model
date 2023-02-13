@@ -21,15 +21,13 @@ from scipy.optimize import minimize
 # Specify directories; settings
 #------------------------------------------------------------
 os.chdir('..')
-os.chdir('..')
-os.chdir('..')
 home_dir = os.getcwd()
-dataDir = home_dir + '/Papers/RoySocB/'
+dataDir = home_dir + '/'
 resDir = dataDir + 'analysis/results/individuals/'
 
 modelSpec = '2vggfeat'
 plot = True
-save = True
+save = False
 niter = 100
 n_base_stims = 7
 
@@ -50,8 +48,8 @@ participantList.sort()
 #%% ---------------------------------------------------------
 # Custom functions
 #------------------------------------------------------------
-sys.path.append((home_dir + "/python_packages"))
-from aestheticsModel import fitPilot
+sys.path.append((home_dir))
+import fitPilot
 
 if 'model' in modelSpec:
     # set specs accordingly
@@ -147,7 +145,7 @@ resList = []
 peepList = []
 counter = 0
 
-for peep in participantList:
+for peep in participantList[:1]:
     ratingData = df[df.subj==peep]
 
     res = np.load(dataDir + 'results/individuals/' + 'fit_' + peep 
