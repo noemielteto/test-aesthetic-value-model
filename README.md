@@ -2,30 +2,15 @@
 Data and analysis files for an experiment testing the viability of [a computational model of aesthetic value developed by Brielmann and Dayan (2022)](https://psycnet.apa.org/fulltext/2022-78031-001.html)(go to psyarxiv for the [free preprint](https://psyarxiv.com/eaqkc/) if you do not have accesss).
 Analyses and plotting functions used here depend on the [main package containing the core functions of the computational model of aesthetic value](https://github.com/aenneb/intro-aesthetic-value-model).
 
-To run the model-fits, you will need to download the main package and change the directory from which it is loaded, i.e., adjust the following lines in the respective scripts:
-```
-home_dir = os.getcwd()
-dataDir = home_dir + '/Papers/RoySocB/'
-```
-and
-```
-sys.path.append((home_dir + "/python_packages"))
-```
-
-You can also only fetch the [main functions from the model implementation](https://github.com/aenneb/intro-aesthetic-value-model/blob/main/python_packages/aestheticsModel/fitPilot.py). Note that you will then need to replace
-```
-from aestheticsModel import fitPilot
-```
-with
-```
-import fitPilot
-```
+For convenience, this repo contains copies of the necessary core package files. So, you do not need to download any additional scripts from another repo and all paths are set so that you can run everything with this repo only. 
 
 If you want to replicate all analyses, you can run all scripts located in the "analysis" folder in alphabetic order. However, I would recommend not to re-fit the model for all participants unless you have a substantial amount of time and/or processing power.
 
 # Folder content
 
 The main directory contains the pre-processed data from all participants as well as the results of the simulated, random-order refits.
+
+It also contains the two components of the core aesthetic value model you need to reproduce the analyses.
 
 In addition, it contains "map_imgName_imgIdx.csv" which provides a safe way to ensure that DNN-derived image features are mapped unto the correct images in the data files. 
 
