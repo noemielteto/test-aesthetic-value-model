@@ -14,18 +14,16 @@ from scipy import stats
 # Specify directories; settings
 #------------------------------------------------------------
 os.chdir('..')
-os.chdir('..')
-os.chdir('..')
 home_dir = os.getcwd()
-dataDir = home_dir + '/Papers/RoySocB'
-figDir = dataDir + '/final paper figures/'
+dataDir = home_dir + '/'
+figDir = dataDir + 'figures/'
 
 #%% ---------------------------------------------------------
 # load data, functions
 #------------------------------------------------------------
-df = pd.read_csv(dataDir + '/perParticipantResults_cv.csv')
-sys.path.append((home_dir + "/python_packages"))
-from aestheticsModel import figureFunctions as ff
+df = pd.read_csv(dataDir + 'perParticipantResults_cv.csv')
+sys.path.append((home_dir))
+import figureFunctions as ff
 
 #%% ---------------------------------------------------------
 # Re-format df to long
