@@ -47,7 +47,9 @@ import fitPilot
 
 if 'model' in modelSpec:
     # set specs accordingly
-    if 'vgg' in modelSpec:
+    if '
+    
+    ' in modelSpec:
         dnnFeatures = 'vgg'
     else:
         dnnFeatures = ''
@@ -74,7 +76,7 @@ else:
 if 'vgg' in modelSpec:
     # get (reduced) VGG features
     featureDf = pd.read_pickle(dataDir
-                               + 'VGG_features/VGG_features_reduced_to_'
+                               + 'vgg_features/vgg_features_reduced_to_'
                                + str(n_features) + '.pkl')
     # now create an array that contains featuers of the images in the right order
     for imgInd in np.unique(df.imageInd):
