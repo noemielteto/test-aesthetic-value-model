@@ -1,21 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon May 23 2022
-Based on script for simulating scrambled trial orders for all participants
-
+Created on Tue Jun 21
 @author: aennebrielmann
 """
 
-import os, sys
+import os,sys
 import numpy as np
 import pandas as pd
-from scipy.optimize import minimize
-
-#%% ---------------------------------------------------------
-# WARNING this script is computationally expensive, especially for the larger models
-# be aware that it might take a long time to run even a few participants
-#------------------------------------------------------------
+from matplotlib import pyplot as plt
+import seaborn as sns
+from scipy import stats
 
 #%% ---------------------------------------------------------
 # Specify directories; settings
@@ -23,15 +18,12 @@ from scipy.optimize import minimize
 os.chdir('..')
 home_dir = os.getcwd()
 dataDir = home_dir + '/'
-resDir = dataDir + 'analysis/results/individuals/'
+resDir = dataDir + 'results/individuals/'
+figDir = dataDir + 'figures/'
 
-modelSpec = '2vggfeat'
+modelSpec = '3vggfeat'
 plot = True
-save = False
-niter = 100
-n_base_stims = 7
 
-exampleSubj = ['kwqcc','7df33'] # 
 sigBetterWithLearn3D = ['mrx1q', 'oveao', 'quzfn', 'zv0ou']
 sigBetterWithLearn2D = ['37o95', '6r8qk', '9gjbe', 'h647a', 'jmzs9',
                         'mbx6w', 'mrx1q', 'ms8r4', 'n0htt', 'njzz4',
@@ -41,6 +33,8 @@ sigBetterWithLearn2D = ['37o95', '6r8qk', '9gjbe', 'h647a', 'jmzs9',
 # Load results
 #------------------------------------------------------------
 infoDf = pd.read_csv(dataDir + 'perParticipantResults_cv.csv')
+backupDf = pd.read_csv(dataDir + 'backup_results_refit_scrambled_'
+                       + modelSpec + '.csv')
 df = pd.read_csv(dataDir + 'merged_rating_data.csv')
 participantList = infoDf.subj.unique()
 participantList.sort()
@@ -80,7 +74,7 @@ else:
 if 'vgg' in modelSpec:
     # get (reduced) VGG features
     featureDf = pd.read_pickle(dataDir
-                               + '/VGG_features/VGG_features_reduced_to_'
+                               + 'VGG_features/VGG_features_reduced_to_'
                                + str(n_features) + '.pkl')
     # now create an array that contains featuers of the images in the right order
     for imgInd in np.unique(df.imageInd):
@@ -138,18 +132,11 @@ resDict = {'r_true': [], 'r_shuffled': [],
            'rmse_shuffled': [], 'rmse_true': [],
            'subj': [], 'alpha': [], 'w_r': [], 'w_V': []}
 
-simRMSE = []
-simR = []
-alphas = []
-resList = []
-peepList = []
-counter = 0
-
-for peep in participantList[:1]:
+for peep in participantList:
     ratingData = df[df.subj==peep]
+    thisBackup = backupDf[backupDf.participant==peep]
 
-    res = np.load(dataDir + 'results/individuals/' + 'fit_' + peep 
-                  + '_' + modelSpec + '.npy',
+    res = np.load(resDir + 'fit_' + peep + '_' + modelSpec + '.npy',
                   allow_pickle=True).tolist()
     modelParameters = res
     alpha, w_V, w_r, _, _, _, _, _, _ = fitPilot.unpackParameters(modelParameters,
@@ -167,55 +154,9 @@ for peep in participantList[:1]:
                                  n_features=n_features,
                                  fixParameters=fixedDict)
 
-    # now, we simulate predictions for shuffled orders
-    simPreds = []
-    simDiff = []
-    for sim in range(niter):
-        tmpDf = tmpDf.sample(frac=1)
-        tmp_res = []
-        tmp_rmse = []
-        
-        for seed in range(10):
-            np.random.seed(seed)
-            randStartValues = np.random.rand(nParams)
-            # adjust scaling for starting point of alpha
-            if 'alphazero' not in fixedDict:
-                randStartValues[0] = randStartValues[0]/100
-            # the usual optimization
-            thisRes = minimize(cost_fn, randStartValues,
-                               args=(tmpDf,),
-                               method='SLSQP',
-                               options={'maxiter': 1e4, 'ftol': 1e-06},
-                               bounds=bounds)
+    r_shuffled = thisBackup.sim_r.mean()
+    rmse_shuffled = thisBackup.sim_rmse.mean()
 
-            tmp_res.append(thisRes)
-            tmp_rmse.append(thisRes.fun)
-            
-        res = tmp_res[tmp_rmse.index(np.nanmin(tmp_rmse))]
-        resList.append(res)
-        simPred = fitPilot.predict(res.x, tmpDf,
-                                 n_features=n_features,
-                                 fixParameters=fixedDict)
-        simPreds.append(simPred)
-        simDiff.append(simPred-tmpDf.rating)
-        
-        simRMSE.append(np.sqrt(np.mean((tmpDf.rating - simPred)**2)))
-        simR.append(np.corrcoef(tmpDf.rating, simPred)[0,1])
-        alphas.append(res.x[0])
-        peepList.append(peep)
-    
-    backupDf = pd.DataFrame({'sim_rmse': simRMSE, 'sim_r': simR, 
-                                'participant': peepList,
-                                'alpha': alphas})
-    backupDf.to_csv(dataDir + 'backup_results_refit_scrambled'
-                    + modelSpec + '.csv',
-                    index=False)
-     
-    avgShuffledPred = np.mean(simPreds,axis=0)
-    sdShuffedPred = np.std(simPreds,axis=0)
-    rmse_shuffled = np.mean(simRMSE, axis=0)
-    r_shuffled = np.mean(simR, axis=0)
-    
     rmse_model = np.sqrt(np.mean((truePred - ratingData.rating[:55])**2))
     r_model = np.corrcoef(truePred, ratingData.rating[:55])[0,1]
     
@@ -227,8 +168,72 @@ for peep in participantList[:1]:
     resDict['alpha'] += [alpha]
     resDict['w_r'] += [w_r]
     resDict['w_V'] += [w_V]
-    
-    counter += 1
-    print('Done with ' + peep + '; ' + str(counter) + ' participants done.')
-    
-    
+
+#%% ---------------------------------------------------------
+# save a summary of these summary statistics
+#------------------------------------------------------------
+resDf= pd.DataFrame(resDict)
+resDf['r2_true'] = resDf.r_true.values**2
+resDf['r2_shuffled'] = resDf.r_shuffled.values**2
+resDf['r2_diff'] = resDf.r2_true - resDf.r2_shuffled
+resDf['r_diff'] = resDf.r_true - resDf.r_shuffled
+resDf['rmse_diff'] = resDf.rmse_true -resDf.rmse_shuffled
+resDf['alpha*w_V'] = resDf.alpha * resDf.w_V
+
+resDf.to_csv(dataDir + 'resDict_summary_refit_scrambled'
+             + modelSpec + '.csv', index=False)
+
+#%% ---------------------------------------------------------
+# plot summary figure
+#------------------------------------------------------------
+
+fig, ax = plt.subplots(figsize=(5,5))
+sns.scatterplot(data=resDf[resDf.alpha!=0], x='r2_true', y='r2_shuffled',
+                hue='w_V', size='alpha',
+                sizes=(30, 200), alpha=1, palette='crest')
+# mark participant with alpha=0 special
+sns.scatterplot(data=resDf[resDf.alpha==0], x='r2_true', y='r2_shuffled',
+                hue='w_V', marker="$\circ$", ec="face", s=100,
+                sizes=(30, 200), alpha=1, palette='crest')
+# mark participants sig better with learning 2D
+sns.scatterplot(data=resDf[resDf.subj.isin(sigBetterWithLearn2D)],
+                x='r2_true', y='r2_shuffled',
+                color='r', marker="x", s=100,
+                sizes=(30, 200), alpha=1, palette='crest')
+# mark participants sig better with learning 3D
+sns.scatterplot(data=resDf[resDf.subj.isin(sigBetterWithLearn3D)],
+                x='r2_true', y='r2_shuffled',
+                color='k', marker="x", s=100,
+                sizes=(30, 200), alpha=1, palette='crest')
+handles, labels = ax.get_legend_handles_labels()
+# Put the legend out of the figure, remove added elments
+properLabels = labels[:10]
+properLabels[0] = r'$w_V$'
+properLabels[5] = r'$\alpha$'
+ax.legend(handles=handles[:10], labels=properLabels, title="",
+          bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0)
+plt.plot([0,.75], [0,.75], ':k', alpha=.33)
+# plt.title(modelSpec)
+plt.xlabel(r'$R^2$ true order')
+plt.ylabel(r'$R^2$ shuffled order')
+sns.despine()
+plt.show()
+fig.savefig(figDir + modelSpec + 'r2 scatter.png', dpi=300, bbox_inches = "tight")
+plt.close()
+
+#%% ---------------------------------------------------------
+# get statistics
+#------------------------------------------------------------
+_,p = stats.shapiro(resDf.r2_diff)
+if p < 0.05:
+    W, pDiff = stats.wilcoxon(resDf.r2_diff)
+else:
+    T, pDiff = stats.ttest_1samp(resDf.r2_diff, popmean=0, nan_policy='omit')
+
+print('corr r2 true - r2 diff')
+print(stats.pearsonr(resDf.r2_true, resDf.r2_diff))
+
+print('corr alpha r2 diff')
+print(stats.pearsonr(resDf.alpha, resDf.r2_diff))
+print('corr wV r2 diff')
+print(stats.pearsonr(resDf.w_V, resDf.r2_diff))
