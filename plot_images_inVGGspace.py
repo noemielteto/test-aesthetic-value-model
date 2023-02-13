@@ -19,7 +19,7 @@ n_morphs = 5
 show_outlier = True
 dataDir = home_dir + '/'
 imageDir = dataDir  + 'experiment_code/images/experiment/'
-dnn = 'VGG'
+dnn = 'vgg'
 
 # !!! DO pay attention to file order!
 imageFiles = glob.glob(imageDir + '*')
