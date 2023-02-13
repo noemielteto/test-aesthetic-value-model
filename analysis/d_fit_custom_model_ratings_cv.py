@@ -20,12 +20,9 @@ from sklearn import preprocessing
 #%% ---------------------------------------------------------
 # Specify directories; settings
 #------------------------------------------------------------
-
-os.chdir('..')
-os.chdir('..')
 os.chdir('..')
 home_dir = os.getcwd()
-dataDir = home_dir + '/Papers/RoySocB/'
+dataDir = home_dir +  '/'
 
 n_features = 2 # dimensionality of assumed feature space
 n_base_stims = 7 # unique images used as basis for morphing
@@ -50,8 +47,8 @@ fitMissingParticipants = False # fit data of participants that cannot be preload
 #%% ---------------------------------------------------------
 # Load model; data
 #------------------------------------------------------------
-sys.path.append((home_dir + "/python_packages"))
-from aestheticsModel import fitPilot
+sys.path.append((home_dir +'/'))
+import fitPilot
 fixedDict = {}
 
 # get data
@@ -311,5 +308,3 @@ if save:
                                 + normalizedFeatures
                                 + varScaling
                                 + '.csv')
-
-
