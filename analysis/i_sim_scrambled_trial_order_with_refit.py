@@ -47,9 +47,7 @@ import fitPilot
 
 if 'model' in modelSpec:
     # set specs accordingly
-    if '
-    
-    ' in modelSpec:
+    if 'vgg' in modelSpec:
         dnnFeatures = 'vgg'
     else:
         dnnFeatures = ''

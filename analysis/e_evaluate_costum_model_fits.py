@@ -72,9 +72,9 @@ else:
     ValueError('Cannot determine number of features')
 
 if 'vgg' in modelSpec:
-    # get (reduced) VGG features
+    # get (reduced) vgg features
     featureDf = pd.read_pickle(dataDir
-                               + 'VGG_features/VGG_features_reduced_to_'
+                               + 'vgg_features/vgg_features_reduced_to_'
                                + str(n_features) + '.pkl')
     # now create an array that contains featuers of the images in the right order
     for imgInd in np.unique(df.imageInd):

@@ -16,12 +16,10 @@ from scipy import stats
 # Specify directories; settings
 #------------------------------------------------------------
 os.chdir('..')
-os.chdir('..')
-os.chdir('..')
 home_dir = os.getcwd()
-dataDir = home_dir + '/Papers/RoySocB/'
+dataDir = home_dir + '/'
 resDir = dataDir + 'results/individuals/'
-figDir = dataDir + 'final paper figures/'
+figDir = dataDir + 'figures/'
 
 modelSpec = '3vggfeat'
 plot = True
@@ -44,8 +42,8 @@ participantList.sort()
 #%% ---------------------------------------------------------
 # Custom functions
 #------------------------------------------------------------
-sys.path.append((home_dir + "/python_packages"))
-from aestheticsModel import fitPilot
+sys.path.append((home_dir))
+import fitPilot
 
 if 'model' in modelSpec:
     # set specs accordingly
