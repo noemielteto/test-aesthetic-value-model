@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Apr 9
-based on simSetup.py and .py
+based on simSetup.py and .py  # what is the second .py?
 
 @author: abrielmann
 
@@ -10,6 +10,21 @@ model of aesthetic value introduced by Brielmann & Dayan (2021)
 """
 import numpy as np
 from statistics import NormalDist # for 1D logLik
+
+# In your requirements.txt, you also have to include the statistics library version
+# because version compatibility issues come up:
+#
+#   File "C:\test-aesthetic-value-model\simExperiment.py", line 12, in <module>
+#     from statistics import NormalDist # for 1D logLik
+# ImportError: cannot import name 'NormalDist' from 'statistics' (C:\Anaconda3\lib\statistics.py)
+#
+# And indeed, my version doesn't have it (or it's differently maed/structured, IDK):
+# import statistics
+# print('NormalDist' in dir(statistics))
+#
+# Maybe it's a better idea to use scipy.stats.norm? I think it's more
+# conventionally used and hopefully better maintined / changed randomly less often?
+
 
 def logLik_from_mahalanobis(stim, mu_x, cov, k=None):
     """calculate the log likelihood of the current image given the presumed
@@ -43,6 +58,10 @@ def logLik_from_mahalanobis(stim, mu_x, cov, k=None):
                 raise
         s_minus_mu = stim - mu_x
         log_p = k - np.dot(np.dot(s_minus_mu.T, inv_cov), s_minus_mu) / 2
+        # I am willing to believe this but since the mahalanobis distance
+        # is not described in the MS or SI and wikipedia provides a different
+        # formula (sqrt(s_minus_mu.T * inv_cov * s_minus_mu)),
+        # maybe you could indicate the source to this?
 
     return log_p
 
@@ -75,6 +94,7 @@ def KL_distributions(mu_true, cov_true, mu_state, cov_state):
             KL = np.inf
         else:
             KL = np.log(cov_state/cov_true) + (cov_true-mu_diff**2)/(2*cov_state**2) - 0.5
+
     else:
         n = len(mu_true)
         try:
@@ -105,6 +125,22 @@ def KL_distributions(mu_true, cov_true, mu_state, cov_state):
               - n
               + np.trace(np.dot(cov_state_inv, cov_true))
               + np.dot(np.dot(mu_diff.T, cov_state_inv), mu_diff))
+
+              # In the technical note that you're referencing, it seems to me
+              # that the whole term should be multiplied by .5 but here only
+              # np.log((cov_state_det / cov_true_det)) is?
+
+              # Also, this is nitpicky but is there a derivation for how the KL is
+              # simplified for the 1d case? At first glance, it's surprising
+              # that there's a multiplication with .5 in the multidimensional case
+              # and a subtraction in the 1d case.
+
+              # It seems that the np.dot(np.dot(mu_diff.T, cov_state_inv), mu_diff))
+              # term is shared between the mahalanobis distance and the KL divergence.
+              # I don't have a well thought through comment here but maybe it could be
+              # computed in a different function for efficiency, so that you
+              # don't compute it twice for the same stimulus; and it would also
+              # make the relationship between the two measures more explicit.
 
     return KL
 
@@ -162,6 +198,8 @@ def calc_predictions(mu, cov, mu_init, cov_init, alpha,
     Calculates A for a given system state and stimulus given known p_true
     as specified by mu_init and cov_init
 
+    # Everything is easy to understand but 'A' is nebulous here.
+
     Parameters
     ----------
     mu : array_like
@@ -183,7 +221,7 @@ def calc_predictions(mu, cov, mu_init, cov_init, alpha,
     stim_dur: int
         presentation duration of stim in arbitrary units of time
     w_r : float, optional
-        realtive weight of r(t) for calculating A(t). The default is 1.
+        relative weight of r(t) for calculating A(t). The default is 1.
     w_V : float, optional
         relative weight of delta-V for calculating A(t). The default is 1.
     bias : float, optional
@@ -219,6 +257,11 @@ def calc_predictions(mu, cov, mu_init, cov_init, alpha,
 
     # get r
     r_t = np.exp(logLik_from_mahalanobis(stim, mu_new, cov))
+    # This is completely conceptual and I'm probably off here but it seems
+    # a bit odd to formulate the processing fluency of the stimulus as the
+    # likelihood under a distribution that was already updated with that
+    # stimulus, i.e. it was already 'processed'. Why not
+    # r_t = np.exp(logLik_from_mahalanobis(stim, mu, cov))?
 
     # get V(t)
     V_t = n_features - KL_distributions(mu_init, cov_init, mu_new, cov)
@@ -265,7 +308,7 @@ def get_view_time(mu_0, cov_state, mu_true, cov_true, alpha,
     Parameters
     ----------
     mu_0 : TYPE
-        DESCRIPTION.
+        DESCRIPTION. # These are underway I guess :D Much of it can be copy-paste from the previosu functions.
     cov_state : TYPE
         DESCRIPTION.
     mu_true : TYPE
@@ -458,7 +501,22 @@ def get_view_times(mu_0, cov_state, mu_true, cov_true, alpha, w_r, w_V,
                 t+=1
              # abort if t gets ridiculously high
             if t > max_view_time:
-                done = True
+                done = True  # very very nitpicky but this means that your actual max_view_time is max_view_time+1
                 view_times.append(t)
+
+        # Same as above but maybe a bit simpler? I haven't tested it though.
+
+        # reset timer at start of each trial
+        # for t in range(0, max_view_time+1):
+        #     main_A, new_mu = calc_predictions(new_mu, cov_state,
+        #                                  mu_true, cov_true,
+        #                                  alpha, main_stim, w_r=w_r,
+        #                                  w_V=w_V, bias=0,
+        #                                  return_mu=True)
+        #     if t > min_view_time and main_A < threshold:
+        #         view_times.append(t)
+        #         continue
+        # view_times.append(t)
+
 
     return view_times, new_mu

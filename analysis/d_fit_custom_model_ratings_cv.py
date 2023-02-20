@@ -49,6 +49,7 @@ fitMissingParticipants = False # fit data of participants that cannot be preload
 #------------------------------------------------------------
 sys.path.append((home_dir +'/'))
 import fitPilot
+
 fixedDict = {}
 
 # get data
@@ -56,8 +57,8 @@ df = pd.read_csv(dataDir + 'merged_rating_data.csv')
 
 if dnnFeatures!='':
         # get (reduced) VGG features
-    featureDf = pd.read_pickle(dataDir + '/' 
-                               + dnnFeatures + '_features/' + dnnFeatures 
+    featureDf = pd.read_pickle(dataDir + '/'
+                               + dnnFeatures + '_features/' + dnnFeatures
                                + '_features_reduced_to_'
                             + str(n_features) + '.pkl')
     # now create an array that contains featuers of the images in the right order
@@ -269,7 +270,7 @@ for peep in participantList[:10]:
 #------------------------------------------------------------
     if plot:
         r_fit = np.corrcoef(ratings[:55], bestPred[:55])[0,1]
-    
+
         fig = plt.figure(0, (5,5))
         plt.plot(ratings[:55], bestPred[:55], 'oC0', label='fit')
         plt.plot([0,1], [0,1], '--k')

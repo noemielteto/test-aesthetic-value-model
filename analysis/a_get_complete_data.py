@@ -141,7 +141,7 @@ df.rt = df.rt/100 # also down-scale RTs
 
 # clean up the image names
 df['image'] = df['raw_image_name'].copy()
-df['image'] = df['image'].str.replace('images/experiment/','')
+df['image'] = df['image'].str.replace('images/experiment/','', regex=True)
 df['image'] = df['image'].str.replace('pair_','')
 df['image'] = df['image'].str.replace('_start','')
 df['image'] = df['image'].str.replace('.png','')
@@ -152,16 +152,24 @@ df['image'] = df['image'].str.replace('(0.6667)','0.67')
 df['image'] = df['image'].str.replace(r'\(','_')
 df['image'] = df['image'].str.replace(r'\)','')
 
+# In these cleanup lines, consider using regex=True, otherwise it gives a
+# FutureWarning: The default value of regex will change from True to False in a
+# future version.
+
 # strip away morph stage, save as image pair variable
 df['pair'] = df['image'].str.replace('0.33','')
 df['pair'] = df['pair'].str.replace('0.5','')
 df['pair'] = df['pair'].str.replace('0.67','')
+
+# same
 
 # now separately store variables for each present source image
 sourceImages = df['image'].str.split(pat='_', expand=True)
 df['sourceImageA'] = sourceImages[0]
 df['sourceImageB'] = sourceImages[1]
 df['morphPercent'] = sourceImages[2]
+
+# same
 
 # add idx, sorted such that they map onto the right stimulus parameters
 idxDf = pd.read_csv(saveDir + '/map_imgName_imgIdx.csv')
