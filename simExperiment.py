@@ -24,6 +24,14 @@ from statistics import NormalDist # for 1D logLik
 #
 # Maybe it's a better idea to use scipy.stats.norm? I think it's more
 # conventionally used and hopefully better maintined / changed randomly less often?
+# Or, if only the normal PDF is needed, you could just use your own:
+# 
+# def my_normpdf(xs, means, sd):
+#     #vector function
+#     var = sd**2
+#     denom = (2*np.pi*var)**.5
+#     num = np.exp(-(np.array(xs)-np.array(means))**2/(2*var))
+#     return num/denom
 
 
 def logLik_from_mahalanobis(stim, mu_x, cov, k=None):
